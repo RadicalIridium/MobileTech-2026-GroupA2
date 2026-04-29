@@ -12,10 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MT2026GroupA2">
         <activity
+            android:name=".ActivityLoadImage"
+            android:exported="false" />
+        <activity
+            android:name=".Activity3OpenCamera"
+            android:exported="false"
+            android:theme="@style/Theme.MT2026GroupA2" />
+        <activity
             android:name=".Activity2"
             android:exported="false" />
         <activity
-            android:name=".ActivityMain1"
+            android:name=".Activity1Main"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
