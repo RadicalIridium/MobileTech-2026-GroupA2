@@ -1,7 +1,6 @@
 package com.example.mt_2026_groupa2;
 
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,27 +8,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class Activity2 extends AppCompatActivity {
+public class Activity5Edit extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_2);
-
-        // Image Changer
-        int imageId = getIntent().getIntExtra("image_id", R.drawable.barcode);
-
-        ImageView imageView = findViewById(R.id.imageViewAct2Change);
-        imageView.setImageResource(imageId);
-
-
+        setContentView(R.layout.activity_activity5_edit);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
-
         });
     }
 }

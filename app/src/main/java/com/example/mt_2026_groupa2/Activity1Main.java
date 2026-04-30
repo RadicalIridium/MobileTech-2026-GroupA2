@@ -3,7 +3,6 @@ package com.example.mt_2026_groupa2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
@@ -13,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class Activity1Main extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +29,12 @@ public class Activity1Main extends AppCompatActivity {
         imageButtonBarcodeReader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Activity1Main.this, Activity2.class);
-                startActivity(intent);
+                Intent intent = new Intent(Activity1Main.this, Activity2MLK.class);
                 // add intent to change image
                 intent.putExtra("image_id", R.drawable.barcode);
+                // add intent to change selected MLK mode
+                intent.putExtra("MLKmode", 1);
+
                 startActivity(intent);
             }
         });
@@ -41,10 +43,12 @@ public class Activity1Main extends AppCompatActivity {
         imageButtonContentReader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Activity1Main.this, Activity2.class);
-                startActivity(intent);
+                Intent intent = new Intent(Activity1Main.this, Activity2MLK.class);
                 // add intent to change image
                 intent.putExtra("image_id", R.drawable.content);
+                // add intent to change selected MLK mode
+                intent.putExtra("MLKmode", 2);
+
                 startActivity(intent);
             }
         });
@@ -53,10 +57,12 @@ public class Activity1Main extends AppCompatActivity {
         imageButtonTextReader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Activity1Main.this, Activity2.class);
-                startActivity(intent);
+                Intent intent = new Intent(Activity1Main.this, Activity2MLK.class);
                 // add intent to change image
                 intent.putExtra("image_id", R.drawable.text);
+                // add intent to change selected MLK mode
+                intent.putExtra("MLKmode", 3);
+
                 startActivity(intent);
             }
         });

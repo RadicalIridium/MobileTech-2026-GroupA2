@@ -5,16 +5,18 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity2">
+    tools:context=".Activity2MLK">
 
     <TextView
         android:id="@+id/textViewAct2Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:text="Get Image From Camera or Gallery"
+        android:textColor="#3F51B5"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,10 +26,11 @@
         android:id="@+id/textViewHint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:text="Tap OPEN CAMERA or LOAD IMAGE to get an image for analysis"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewAct2Title" />
@@ -35,10 +38,11 @@
     <ImageView
         android:id="@+id/imageViewAct2Change"
         android:layout_width="0dp"
-        android:layout_height="316dp"
+        android:layout_height="450dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewHint"
@@ -50,7 +54,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:onClick="openCamera"
         android:text="Open Camera"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageViewAct2Change" />
 
@@ -60,7 +66,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:onClick="loadImage"
         android:text="Load Image"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewAct2Change" />
+
+    <Button
+        android:id="@+id/buttonEditResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="16dp"
+        android:text="Edit Results"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLoadImage"
+        app:layout_constraintStart_toEndOf="@+id/buttonOpenCamera"
         app:layout_constraintTop_toBottomOf="@+id/imageViewAct2Change" />
 </androidx.constraintlayout.widget.ConstraintLayout>
