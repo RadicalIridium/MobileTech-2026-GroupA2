@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MT2026GroupA2">
         <activity
+            android:name=".Activity6MLK"
+            android:exported="false" />
+        <activity
             android:name=".ActivityLoadImage"
             android:exported="false" />
         <activity
