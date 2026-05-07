@@ -92,9 +92,13 @@ public class Activity2MLK extends AppCompatActivity {
 
         buttonEditResults.setOnClickListener(v -> {
             Intent intent = new Intent(Activity2MLK.this, Activity5Edit.class);
+
+            intent.putExtra("imageUri", imageFileUri.toString());
+            intent.putExtra("result", textViewOutput.getText().toString());
+            intent.putExtra("MLKmode", MLKmode);
+
             startActivity(intent);
         });
-
     }
 
     private boolean checkPermission() {
