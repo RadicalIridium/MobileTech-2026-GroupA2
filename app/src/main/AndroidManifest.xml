@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MT2026GroupA2">
         <activity
+            android:name=".Activity7Detail"
+            android:exported="false" />
+        <activity
             android:name=".Activity5Edit"
             android:exported="false" />
         <activity

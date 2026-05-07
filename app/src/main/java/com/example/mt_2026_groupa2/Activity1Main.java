@@ -3,6 +3,7 @@ package com.example.mt_2026_groupa2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
@@ -65,6 +66,13 @@ public class Activity1Main extends AppCompatActivity {
 
                 startActivity(intent);
             }
+        });
+
+        Button buttonList = findViewById(R.id.buttonLsAnalysedImages);
+
+        buttonList.setOnClickListener(v -> {
+            Intent intent = new Intent(Activity1Main.this, Activity6List.class);
+            startActivity(intent);
         });
 
     }
