@@ -14,6 +14,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class Activity5Edit extends AppCompatActivity {
 
@@ -143,6 +147,36 @@ public class Activity5Edit extends AppCompatActivity {
         }
     }
 
+    private String copyImageToAppStorage(String uriString) {
+        try {
+            File destDir = new File(getFilesDir(), "saved_images");
+            if (!destDir.exists()) destDir.mkdirs();
+
+            String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+            File destFile = new File(destDir, fileName);
+
+            Uri sourceUri = Uri.parse(uriString);
+
+            try (InputStream in = getContentResolver().openInputStream(sourceUri);
+                 OutputStream out = new FileOutputStream(destFile)) {
+
+                if (in == null) return uriString; // fallback to original
+
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+
+            return Uri.fromFile(destFile).toString(); // permanent file:// URI
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return uriString; // fallback to original if copy fails
+        }
+    }
+
     private void saveToFirebase() {
 
         if (id == null || id.isEmpty()) {
@@ -182,7 +216,11 @@ public class Activity5Edit extends AppCompatActivity {
 
         data.put("result", result);
 
-        data.put("imageUri", imageUriString);
+        String permanentUri = (imageUriString != null && !imageUriString.isEmpty())
+                ? copyImageToAppStorage(imageUriString)
+                : imageUriString;
+
+        data.put("imageUri", permanentUri);
 
         databaseReference
                 .child(id)
