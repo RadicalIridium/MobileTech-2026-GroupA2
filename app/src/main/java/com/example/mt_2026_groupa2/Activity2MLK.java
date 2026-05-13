@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -50,215 +50,445 @@ import java.util.List;
 public class Activity2MLK extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSION = 3000;
+
     private Uri imageFileUri;
+
     private ImageView imageView;
     private TextView textViewOutput;
 
-    //So only one MLK runs
     private int MLKmode;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_2mlk);
 
         imageView = findViewById(R.id.imageViewAct2Change);
         textViewOutput = findViewById(R.id.textViewHint);
 
-        // Image Changer
-        int imageId = getIntent().getIntExtra("image_id", R.drawable.barcode);
+        int imageId =
+                getIntent().getIntExtra(
+                        "image_id",
+                        R.drawable.barcode
+                );
 
-        ImageView imageView = findViewById(R.id.imageViewAct2Change);
         imageView.setImageResource(imageId);
 
-        // MLK Selector
         MLKmode = getIntent().getIntExtra("MLKmode", 1);
-        Log.d("MLKMODE", "Mode = "+ MLKmode);
 
-        // Edit results toggle function
-        Button buttonEditResults = findViewById(R.id.buttonEditResults);
+        Log.d("MLKMODE", "Mode = " + MLKmode);
+
+        Button buttonEditResults =
+                findViewById(R.id.buttonEditResults);
+
         buttonEditResults.setVisibility(View.GONE);
         buttonEditResults.setEnabled(false);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(R.id.main),
+                (v, insets) -> {
+
+                    Insets systemBars =
+                            insets.getInsets(
+                                    WindowInsetsCompat.Type.systemBars()
+                            );
+
+                    v.setPadding(
+                            systemBars.left,
+                            systemBars.top,
+                            systemBars.right,
+                            systemBars.bottom
+                    );
+
+                    return insets;
+                });
 
         buttonEditResults.setOnClickListener(v -> {
-            Intent intent = new Intent(Activity2MLK.this, Activity5Edit.class);
 
-            intent.putExtra("imageUri", imageFileUri.toString());
-            intent.putExtra("result", textViewOutput.getText().toString());
-            intent.putExtra("MLKmode", MLKmode);
+            if (imageFileUri == null) {
+
+                Toast.makeText(
+                        Activity2MLK.this,
+                        "No image selected",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            Intent intent =
+                    new Intent(
+                            Activity2MLK.this,
+                            Activity5Edit.class
+                    );
+
+            intent.putExtra(
+                    "imageUri",
+                    imageFileUri.toString()
+            );
+
+            intent.putExtra(
+                    "result",
+                    textViewOutput.getText().toString()
+            );
+
+            intent.putExtra(
+                    "MLKmode",
+                    MLKmode
+            );
 
             startActivity(intent);
         });
     }
 
     private boolean checkPermission() {
+
         String permission = android.Manifest.permission.CAMERA;
-        boolean grantCamera = ContextCompat.checkSelfPermission(this, permission) ==
-                PackageManager.PERMISSION_GRANTED;
+
+        boolean grantCamera =
+                ContextCompat.checkSelfPermission(
+                        this,
+                        permission
+                ) == PackageManager.PERMISSION_GRANTED;
+
         if (!grantCamera) {
-            ActivityCompat.requestPermissions(this, new String[]{permission},
-                    REQUEST_PERMISSION);
+
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{permission},
+                    REQUEST_PERMISSION
+            );
         }
+
         return grantCamera;
     }
 
     public void openCamera(View view) {
-        if (checkPermission() == false)
+
+        if (!checkPermission()) {
             return;
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        }
+
+        Intent takePhotoIntent =
+                new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         imageFileUri =
-                getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new
-                        ContentValues());
-        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+                getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        new ContentValues()
+                );
+
+        if (imageFileUri == null) {
+
+            Toast.makeText(
+                    this,
+                    "Unable to create image",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        takePhotoIntent.putExtra(
+                MediaStore.EXTRA_OUTPUT,
+                imageFileUri
+        );
+
         activityResultLauncher.launch(takePhotoIntent);
     }
+
     public void loadImage(View view) {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        Intent galleryIntent =
+                new Intent(
+                        Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                );
+
         activityResultLauncher.launch(galleryIntent);
     }
 
     ActivityResultLauncher<Intent> activityResultLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
+
                     new ActivityResultCallback<ActivityResult>() {
+
                         @Override
                         public void onActivityResult(ActivityResult result) {
-                            if (result.getResultCode() == RESULT_OK) {
+
+                            if (result.getResultCode() != RESULT_OK) {
+                                return;
+                            }
+
+                            try {
+
                                 if (result.getData() != null &&
-                                        result.getData().getData() != null)
-                                    imageFileUri = result.getData().getData();
+                                        result.getData().getData() != null) {
+
+                                    imageFileUri =
+                                            result.getData().getData();
+                                }
+
+                                if (imageFileUri == null) {
+
+                                    Toast.makeText(
+                                            Activity2MLK.this,
+                                            "Image not found",
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+
+                                    return;
+                                }
+
                                 imageView.setImageURI(imageFileUri);
-                                // Add code for ML Kit below this line
 
                                 textViewOutput.setText("");
-                                InputImage image = null;
-                                try {
-                                    image = InputImage.fromFilePath(getBaseContext(), imageFileUri);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                if (image != null) {
-                                    switch (MLKmode) {
-                                        case 1:
-                                            processImageFromBarcodeReader(image);
-                                            break;
-                                        case 2:
-                                            processImageFromContentReader(image);
-                                            break;
-                                        case 3:
-                                            processImageFromTextReader(image);
-                                            break;
-                                    }
-                                    //Switch to visibility
-                                    Button buttonEditResults = findViewById(R.id.buttonEditResults);
-                                    buttonEditResults.setVisibility(View.VISIBLE);
-                                    buttonEditResults.setEnabled(true);
 
+                                InputImage image =
+                                        InputImage.fromFilePath(
+                                                Activity2MLK.this,
+                                                imageFileUri
+                                        );
+
+                                switch (MLKmode) {
+
+                                    case 1:
+                                        processImageFromBarcodeReader(image);
+                                        break;
+
+                                    case 2:
+                                        processImageFromContentReader(image);
+                                        break;
+
+                                    case 3:
+                                        processImageFromTextReader(image);
+                                        break;
                                 }
+
+                                Button buttonEditResults =
+                                        findViewById(
+                                                R.id.buttonEditResults
+                                        );
+
+                                buttonEditResults.setVisibility(View.VISIBLE);
+
+                                buttonEditResults.setEnabled(true);
+
+                            } catch (IOException e) {
+
+                                Toast.makeText(
+                                        Activity2MLK.this,
+                                        "Failed to load image",
+                                        Toast.LENGTH_LONG
+                                ).show();
+
+                                e.printStackTrace();
+
+                            } catch (Exception e) {
+
+                                Toast.makeText(
+                                        Activity2MLK.this,
+                                        "Unexpected error",
+                                        Toast.LENGTH_LONG
+                                ).show();
+
+                                e.printStackTrace();
                             }
                         }
                     });
 
+    public void processImageFromBarcodeReader(InputImage image) {
 
-    public void processImageFromBarcodeReader (InputImage image) {
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
-                        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS).build();
-        BarcodeScanner scanner = BarcodeScanning.getClient(options);
-        Task<List<Barcode>> result = scanner.process(image)
-                .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                    @Override
-                    public void onSuccess(List<Barcode> barcodes) {
-                        textViewOutput.append(Html.fromHtml("<font color='navy'><b>Detected barcode:</b></font><br>", Html.FROM_HTML_MODE_LEGACY));
-                        String result = "";
-                        for (Barcode barcode : barcodes) {
-                            result = barcode.getRawValue();
-                            textViewOutput.append(result + "\n");
-                        }
-                        if (result.length() < 2) {
-                            textViewOutput.append(" Barcode not found.\n");
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        textViewOutput.setText("Failed");
-                    }
-                });
-    }
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_ALL_FORMATS
+                        )
+                        .build();
 
+        BarcodeScanner scanner =
+                BarcodeScanning.getClient(options);
 
-    public void processImageFromContentReader(InputImage image) {
-        ImageLabeler labeler = ImageLabeling.getClient(
-                ImageLabelerOptions.DEFAULT_OPTIONS);
-        labeler.process(image)
-                .addOnSuccessListener(
-                        new OnSuccessListener<List<ImageLabel>>() {
-                            @Override
-                            public void onSuccess(List<ImageLabel> labels) {
-                                if (labels.size() == 0) {
-                                    textViewOutput.append("Nothing found in the image\n");
-                                    return;
-                                }
-                                textViewOutput.append(Html.fromHtml("<font color='navy'><b>Detected image content:</b></font><br>",
-                                Html.FROM_HTML_MODE_LEGACY));
-                                int counter = 1;
-                                for (ImageLabel label : labels) {
-                                    String result = label.getText();
-                                    float confidence = label.getConfidence();
-                                    textViewOutput.append(" " +
-                                            counter + ". " + result +
-                                            " (" + String.format("%.1f", confidence * 100.0f) +
-                                            "% confidence)\n");
-                                    counter++;
-                                }
-                            }
-                        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        textViewOutput.setText("Failed");
-                    }
-                });
-    }
+        Task<List<Barcode>> result =
+                scanner.process(image)
 
-    public void processImageFromTextReader(InputImage image) {
-        TextRecognizer recognizer =
-                TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        Task<Text> result =
-                recognizer.process(image)
-                        .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
-                            public void onSuccess(Text visionText) {
-                                textViewOutput.append(Html.fromHtml("<font color='navy'><b>Detected text:</b></font><br>", Html.FROM_HTML_MODE_LEGACY));
-                                // Task completed successfully
-                                String result = visionText.getText();
-                                if (result.length() > 1)
-                                    textViewOutput.append(" " + result + "\n");
-                                else
-                                    textViewOutput.append(" No text found.\n");
-                            }
-                        })
+                        .addOnSuccessListener(
+                                new OnSuccessListener<List<Barcode>>() {
+
+                                    @Override
+                                    public void onSuccess(
+                                            List<Barcode> barcodes
+                                    ) {
+
+                                        textViewOutput.append(
+                                                Html.fromHtml(
+                                                        "<font color='navy'><b>Detected barcode:</b></font><br>",
+                                                        Html.FROM_HTML_MODE_LEGACY
+                                                )
+                                        );
+
+                                        String result = "";
+
+                                        for (Barcode barcode : barcodes) {
+
+                                            result =
+                                                    barcode.getRawValue();
+
+                                            textViewOutput.append(
+                                                    result + "\n"
+                                            );
+                                        }
+
+                                        if (result.length() < 2) {
+
+                                            textViewOutput.append(
+                                                    " Barcode not found.\n"
+                                            );
+                                        }
+                                    }
+                                })
+
                         .addOnFailureListener(
                                 new OnFailureListener() {
+
                                     @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    // Task failed with an exception
+                                    public void onFailure(
+                                            @NonNull Exception e
+                                    ) {
+
                                         textViewOutput.setText("Failed");
                                     }
                                 });
     }
 
+    public void processImageFromContentReader(InputImage image) {
+
+        ImageLabeler labeler =
+                ImageLabeling.getClient(
+                        ImageLabelerOptions.DEFAULT_OPTIONS
+                );
+
+        labeler.process(image)
+
+                .addOnSuccessListener(
+                        new OnSuccessListener<List<ImageLabel>>() {
+
+                            @Override
+                            public void onSuccess(
+                                    List<ImageLabel> labels
+                            ) {
+
+                                if (labels.size() == 0) {
+
+                                    textViewOutput.append(
+                                            "Nothing found in the image\n"
+                                    );
+
+                                    return;
+                                }
+
+                                textViewOutput.append(
+                                        Html.fromHtml(
+                                                "<font color='navy'><b>Detected image content:</b></font><br>",
+                                                Html.FROM_HTML_MODE_LEGACY
+                                        )
+                                );
+
+                                int counter = 1;
+
+                                for (ImageLabel label : labels) {
+
+                                    String result =
+                                            label.getText();
+
+                                    float confidence =
+                                            label.getConfidence();
+
+                                    textViewOutput.append(
+                                            " " +
+                                                    counter +
+                                                    ". " +
+                                                    result +
+                                                    " (" +
+                                                    String.format(
+                                                            "%.1f",
+                                                            confidence * 100.0f
+                                                    ) +
+                                                    "% confidence)\n"
+                                    );
+
+                                    counter++;
+                                }
+                            }
+                        })
+
+                .addOnFailureListener(
+                        new OnFailureListener() {
+
+                            @Override
+                            public void onFailure(
+                                    @NonNull Exception e
+                            ) {
+
+                                textViewOutput.setText("Failed");
+                            }
+                        });
+    }
+
+    public void processImageFromTextReader(InputImage image) {
+
+        TextRecognizer recognizer =
+                TextRecognition.getClient(
+                        TextRecognizerOptions.DEFAULT_OPTIONS
+                );
+
+        recognizer.process(image)
+
+                .addOnSuccessListener(
+                        new OnSuccessListener<Text>() {
+
+                            @Override
+                            public void onSuccess(Text visionText) {
+
+                                textViewOutput.append(
+                                        Html.fromHtml(
+                                                "<font color='navy'><b>Detected text:</b></font><br>",
+                                                Html.FROM_HTML_MODE_LEGACY
+                                        )
+                                );
+
+                                String result =
+                                        visionText.getText();
+
+                                if (result.length() > 1) {
+
+                                    textViewOutput.append(
+                                            " " + result + "\n"
+                                    );
+
+                                } else {
+
+                                    textViewOutput.append(
+                                            " No text found.\n"
+                                    );
+                                }
+                            }
+                        })
+
+                .addOnFailureListener(
+                        new OnFailureListener() {
+
+                            @Override
+                            public void onFailure(
+                                    @NonNull Exception e
+                            ) {
+
+                                textViewOutput.setText("Failed");
+                            }
+                        });
+    }
 }

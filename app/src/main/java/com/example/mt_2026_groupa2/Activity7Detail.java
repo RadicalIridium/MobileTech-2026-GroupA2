@@ -44,33 +44,99 @@ public class Activity7Detail extends AppCompatActivity {
         result = getIntent().getStringExtra("result");
         imageUri = getIntent().getStringExtra("imageUri");
 
+        if (reader == null || reader.isEmpty()) {
+            reader = "Unknown Reader";
+        }
+
+        if (result == null) {
+            result = "";
+        }
+
         textViewReader.setText(reader);
         textViewResult.setText(result);
 
-        if (imageUri != null) {
-            imageViewDetail.setImageURI(Uri.parse(imageUri));
+        imageViewDetail.setImageResource(android.R.color.transparent);
+
+        if (imageUri != null && !imageUri.isEmpty()) {
+
+            try {
+
+                Uri uri = Uri.parse(imageUri);
+
+                imageViewDetail.post(() -> {
+
+                    try {
+
+                        imageViewDetail.setImageURI(uri);
+
+                    } catch (SecurityException e) {
+
+                        imageViewDetail.setImageResource(
+                                android.R.color.transparent
+                        );
+
+                    } catch (Exception e) {
+
+                        imageViewDetail.setImageResource(
+                                android.R.color.transparent
+                        );
+                    }
+                });
+
+            } catch (Exception e) {
+
+                imageViewDetail.setImageResource(
+                        android.R.color.transparent
+                );
+            }
         }
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("MLKitResults");
+        databaseReference = FirebaseDatabase
+                .getInstance()
+                .getReference("MLKitResults");
 
         buttonEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(Activity7Detail.this, Activity5Edit.class);
 
+            Intent intent =
+                    new Intent(Activity7Detail.this, Activity5Edit.class);
+
+            intent.putExtra("id", id);
+            intent.putExtra("reader", reader);
             intent.putExtra("imageUri", imageUri);
             intent.putExtra("result", result);
+            intent.putExtra("isEdit", true);
 
             startActivity(intent);
         });
 
         buttonDelete.setOnClickListener(v -> {
-            databaseReference.child(id).removeValue()
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(Activity7Detail.this,
-                                "Deleted successfully",
-                                Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(Activity7Detail.this,
-                                Activity6List.class);
+            if (id == null || id.isEmpty()) {
+
+                Toast.makeText(
+                        Activity7Detail.this,
+                        "Invalid item",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            databaseReference.child(id).removeValue()
+
+                    .addOnSuccessListener(unused -> {
+
+                        Toast.makeText(
+                                Activity7Detail.this,
+                                "Deleted successfully",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        Intent intent =
+                                new Intent(
+                                        Activity7Detail.this,
+                                        Activity6List.class
+                                );
 
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -78,14 +144,16 @@ public class Activity7Detail extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     })
+
                     .addOnFailureListener(e ->
-                            Toast.makeText(Activity7Detail.this,
+
+                            Toast.makeText(
+                                    Activity7Detail.this,
                                     "Delete failed",
-                                    Toast.LENGTH_SHORT).show());
+                                    Toast.LENGTH_SHORT
+                            ).show());
         });
 
-        buttonCancel.setOnClickListener(v -> {
-            finish();
-        });
+        buttonCancel.setOnClickListener(v -> finish());
     }
 }
